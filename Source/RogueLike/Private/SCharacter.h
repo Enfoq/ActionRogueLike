@@ -25,10 +25,18 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	UCameraComponent* CameraComp;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AActor> PrimaryAttackProjectileClass;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	/** Movement */
 	void MoveForward(float Value);
+	void MoveRight(float Value);
+
+	/** Fire */
+	void PrimaryAttack();
 
 public:	
 	// Called every frame
