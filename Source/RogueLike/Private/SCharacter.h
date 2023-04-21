@@ -8,6 +8,8 @@
 
 class UCameraComponent;
 class USpringArmComponent;
+class USInteractionComponent;
+class UAnimMontage;
 
 UCLASS()
 class ASCharacter : public ACharacter
@@ -25,8 +27,18 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	UCameraComponent* CameraComp;
 
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<AActor> PrimaryAttackProjectileClass;
+	UPROPERTY(VisibleAnywhere, Category = Interaction)
+	USInteractionComponent* InteractionComp;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Attack")
+	TSubclassOf<AActor> ProjectileClass;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	UAnimMontage* AttackAnim;
+
+	FTimerHandle PrimaryAttackTimerHandle;
+
+	void PrimaryAttackTimeElapsed();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -37,6 +49,9 @@ protected:
 
 	/** Fire */
 	void PrimaryAttack();
+
+	/** Interaction */
+	void PrimaryInteract();
 
 public:	
 	// Called every frame

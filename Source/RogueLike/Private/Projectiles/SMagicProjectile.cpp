@@ -5,6 +5,7 @@
 #include "Components/SphereComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ASMagicProjectile::ASMagicProjectile()
@@ -28,6 +29,8 @@ ASMagicProjectile::ASMagicProjectile()
 void ASMagicProjectile::BeginPlay()
 {
 	Super::BeginPlay();
+	SphereComp->OnComponentHit.AddDynamic(this, &ThisClass::OnProjectileHit);
+	SphereComp->IgnoreActorWhenMoving(GetInstigator(), true);
 }
 
 // Called every frame
@@ -36,3 +39,12 @@ void ASMagicProjectile::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void ASMagicProjectile::OnProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	//AActor* InstigatorActor = Cast<AActor>(GetInstigator());
+	//if (InstigatorActor != OtherActor)
+	//{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitEffect, GetActorLocation(), GetActorRotation());
+		Destroy();
+	//}
+}
