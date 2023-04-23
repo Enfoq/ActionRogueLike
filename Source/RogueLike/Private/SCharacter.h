@@ -50,6 +50,8 @@ protected:
 	/** Fire */
 	void PrimaryAttack();
 
+	bool bCanFire = true;
+
 	/** Interaction */
 	void PrimaryInteract();
 
@@ -60,4 +62,8 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+private:
+	void TraceUnderCrosshair();
+
+	FVector_NetQuantize ImpactPoint;
 };
