@@ -11,6 +11,8 @@
 
 #define TRACE_LENGTH 80000.f;
 
+DEFINE_LOG_CATEGORY_STATIC(PLAYER, All, All)
+
 // Sets default values
 ASCharacter::ASCharacter()
 {
@@ -44,7 +46,21 @@ void ASCharacter::PrimaryAttackTimeElapsed()
 	UWorld* World = GetWorld();
 	if (World)
 	{
-		World->SpawnActor<AActor>(ProjectileClass, HandLocation, SpawnRotation, SpawnParams);
+		switch (AttackType)
+		{
+		case EAttackType::SimpleAttack:
+			World->SpawnActor<AActor>(BasicAttackProjectileClass, HandLocation, SpawnRotation, SpawnParams);
+			break;
+		case EAttackType::BlackHole:
+			World->SpawnActor<AActor>(BlackHoleProjectileClass, HandLocation, SpawnRotation, SpawnParams);
+			break;
+		case EAttackType::Teleport:
+			World->SpawnActor<AActor>(TeleportProjectileClass, HandLocation, SpawnRotation, SpawnParams);
+			break;
+		case EAttackType::MAX:
+			break;
+
+		}
 	}
 	bCanFire = true;
 }
@@ -107,6 +123,9 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction(TEXT("PrimaryAttack"), IE_Pressed, this, &ThisClass::PrimaryAttack);
 	PlayerInputComponent->BindAction(TEXT("PrimaryInteract"), IE_Pressed, this, &ThisClass::PrimaryInteract);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction(TEXT("SimpleAttackType"), IE_Pressed, this, &ThisClass::ChangeAttackTypeToSimple);
+	PlayerInputComponent->BindAction(TEXT("BlackHoleAttackType"), IE_Pressed, this, &ThisClass::ChangeAttackTypeToBlackHole);
+	PlayerInputComponent->BindAction(TEXT("TeleportAttackType"), IE_Pressed, this, &ThisClass::ChangeAttackTypeToTeleport);
 }
 
 void ASCharacter::TraceUnderCrosshair()
@@ -129,4 +148,22 @@ void ASCharacter::TraceUnderCrosshair()
 		GetWorld()->LineTraceSingleByChannel(HitResult, StartPoint, EndPoint, ECollisionChannel::ECC_Visibility);
 		ImpactPoint = !HitResult.bBlockingHit ? EndPoint : HitResult.ImpactPoint;
 	}
+}
+
+void ASCharacter::ChangeAttackTypeToTeleport()
+{
+	UE_LOG(PLAYER, Display, TEXT("Changed attack type to TELEPORT"));
+	AttackType = EAttackType::Teleport;
+}
+
+void ASCharacter::ChangeAttackTypeToSimple()
+{
+	UE_LOG(PLAYER, Display, TEXT("Changed attack type to SIMPLE"));
+	AttackType = EAttackType::SimpleAttack;
+}
+
+void ASCharacter::ChangeAttackTypeToBlackHole()
+{
+	UE_LOG(PLAYER, Display, TEXT("Changed attack type to BLACKHOLE"));
+	AttackType = EAttackType::BlackHole;
 }

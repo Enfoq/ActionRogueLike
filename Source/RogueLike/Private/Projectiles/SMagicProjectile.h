@@ -31,19 +31,7 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UParticleSystemComponent* EffectComp;
 
-	UPROPERTY(EditAnywhere)
-	UParticleSystem* HitEffect;
-
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-private:
-	UFUNCTION()
-		void OnProjectileHit(UPrimitiveComponent* HitComponent,
-			AActor* OtherActor, UPrimitiveComponent* OtherComp,
-			FVector NormalImpulse, const FHitResult& Hit);
 };
