@@ -6,7 +6,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "PhysicsEngine/RadialForceComponent.h"
 
-#define BLACKHOLE_ANIM_DELAY 0.5f
+#define BLACKHOLE_ANIM_DELAY 0.4f
 
 ASBlackHoleProjectile::ASBlackHoleProjectile()
 {
@@ -22,14 +22,18 @@ ASBlackHoleProjectile::ASBlackHoleProjectile()
 void ASBlackHoleProjectile::BeginPlay()
 {
 	Super::BeginPlay();
+	RadialForceComp->bAutoActivate = false;
+	
+	GetWorldTimerManager().SetTimer(LifetimeTimerHandle, this, &ThisClass::DestroyOnTimer, 0.1f, false, LifeTimeOfProjectile);
+	GetWorldTimerManager().SetTimer(PullInOverlappedActorsTimerHandle, this, &ThisClass::DestroyOverlappedActors, 0.1f, true, BLACKHOLE_ANIM_DELAY);
 
-	GetWorldTimerManager().SetTimer(LifetimeTimerHandle, this, &ThisClass::DestroyOnTimer, 5.0f, false, 5.0f);
-	GetWorldTimerManager().SetTimer(ForceApplyTimerHandle, this, &ThisClass::DestroyOverlappedActors, 0.1f, true, BLACKHOLE_ANIM_DELAY);
+	FTimerHandle ActivateBlackHoleTHandle;
+	GetWorldTimerManager().SetTimer(ActivateBlackHoleTHandle, this, &ThisClass::ActivateBlackHole, 0.1f, false, BLACKHOLE_ANIM_DELAY);
 }
 
 void ASBlackHoleProjectile::DestroyOnTimer()
 {
-	GetWorldTimerManager().ClearTimer(ForceApplyTimerHandle);
+	GetWorldTimerManager().ClearTimer(PullInOverlappedActorsTimerHandle);
 	Destroy();
 }
 
@@ -37,9 +41,14 @@ void ASBlackHoleProjectile::DestroyOverlappedActors()
 {
 	TArray<AActor*> OverlappingActors;
 	SphereComp->GetOverlappingActors(OverlappingActors);
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("There are %d overlapped actors"), OverlappingActors.Num()));
 	for (AActor* OverActor : OverlappingActors)
 	{
 		OverActor->Destroy();
 	}
+}
+
+void ASBlackHoleProjectile::ActivateBlackHole()
+{
+	MovementComp->MaxSpeed = 150.f;
+	RadialForceComp->Activate();
 }

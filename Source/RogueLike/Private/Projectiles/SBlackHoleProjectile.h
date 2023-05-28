@@ -25,12 +25,17 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	URadialForceComponent* RadialForceComp;
 
+	UPROPERTY(EditDefaultsOnly)
+	float LifeTimeOfProjectile = 5.0f;
+
 private:
 	void DestroyOnTimer();
 
 	void DestroyOverlappedActors();
 
+	void ActivateBlackHole();
+
 	FTimerHandle LifetimeTimerHandle;
 
-	FTimerHandle ForceApplyTimerHandle;
+	FTimerHandle PullInOverlappedActorsTimerHandle;
 };
