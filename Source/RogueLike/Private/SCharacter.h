@@ -11,6 +11,15 @@ class USpringArmComponent;
 class USInteractionComponent;
 class UAnimMontage;
 
+enum class EAttackType : uint8
+{
+	SimpleAttack,
+	BlackHole,
+	Teleport,
+
+	MAX
+};
+
 UCLASS()
 class ASCharacter : public ACharacter
 {
@@ -31,7 +40,13 @@ protected:
 	USInteractionComponent* InteractionComp;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Attack")
-	TSubclassOf<AActor> ProjectileClass;
+	TSubclassOf<AActor> BasicAttackProjectileClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Attack")
+	TSubclassOf<AActor> BlackHoleProjectileClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Attack")
+	TSubclassOf<AActor> TeleportProjectileClass;
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	UAnimMontage* AttackAnim;
@@ -50,6 +65,8 @@ protected:
 	/** Fire */
 	void PrimaryAttack();
 
+	bool bCanFire = true;
+
 	/** Interaction */
 	void PrimaryInteract();
 
@@ -60,4 +77,14 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+private:
+	void TraceUnderCrosshair();
+
+	void ChangeAttackTypeToTeleport();
+	void ChangeAttackTypeToSimple();
+	void ChangeAttackTypeToBlackHole();
+
+	FVector_NetQuantize ImpactPoint;
+
+	EAttackType AttackType = EAttackType::SimpleAttack;
 };
