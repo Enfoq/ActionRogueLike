@@ -23,17 +23,18 @@ void ASTeleportProjectile::OnProjectileHit(UPrimitiveComponent* HitComponent, AA
 void ASTeleportProjectile::Detonate()
 {
 	MovementComp->StopMovementImmediately();
-	if (HitEffect)
+	if (IsValid(HitEffect))
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitEffect, GetActorLocation(), GetActorRotation());
 	}
+
 	StartTeleportTimer();
 }
 
 void ASTeleportProjectile::Teleport()
 {
 	APawn* InstigatorPawn = GetInstigator();
-	if (InstigatorPawn)
+	if (IsValid(InstigatorPawn))
 	{
 		InstigatorPawn->TeleportTo(GetActorLocation(), InstigatorPawn->GetActorRotation(), false, true);
 	}

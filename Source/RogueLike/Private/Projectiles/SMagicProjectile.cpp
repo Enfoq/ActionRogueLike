@@ -29,18 +29,13 @@ ASMagicProjectile::ASMagicProjectile()
 
 void ASMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (!OtherActor)
-	{
-		return;
-	}
-
-	if (OtherActor == GetInstigator())
+	if (!IsValid(OtherActor) || OtherActor == GetInstigator())
 	{
 		return;
 	}
 
 	USAttributesComponent* AttrComp = Cast<USAttributesComponent>(OtherActor->GetComponentByClass(USAttributesComponent::StaticClass()));
-	if (AttrComp)
+	if (IsValid(AttrComp))
 	{
 		AttrComp->ApplyHealthChange(-20.f);
 		Destroy();
