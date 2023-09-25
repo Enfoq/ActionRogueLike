@@ -27,13 +27,14 @@ void ASTeleportProjectile::Detonate()
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitEffect, GetActorLocation(), GetActorRotation());
 	}
+
 	StartTeleportTimer();
 }
 
 void ASTeleportProjectile::Teleport()
 {
 	APawn* InstigatorPawn = GetInstigator();
-	if (InstigatorPawn)
+	if (IsValid(InstigatorPawn))
 	{
 		InstigatorPawn->TeleportTo(GetActorLocation(), InstigatorPawn->GetActorRotation(), false, true);
 	}

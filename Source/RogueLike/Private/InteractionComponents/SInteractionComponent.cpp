@@ -36,6 +36,11 @@ void USInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 void USInteractionComponent::PrimaryInteract()
 {
 	AActor* MyOwner = GetOwner();
+	if (!IsValid(MyOwner))
+	{
+		return;
+	}
+
 	FVector EyeLocation;
 	FRotator EyeRotation;
 	MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
@@ -53,16 +58,16 @@ void USInteractionComponent::PrimaryInteract()
 
 	for (FHitResult& Hit : HitResults)
 	{
-		if (AActor* HitActor = Hit.GetActor())
+		AActor* HitActor = Hit.GetActor();
+		if (!IsValid(HitActor) || !HitActor->Implements<USGameplayInterface>())
 		{
-			if (HitActor->Implements<USGameplayInterface>())
-			{
-				APawn* MyPawn = Cast<APawn>(MyOwner);
-				ISGameplayInterface::Execute_Interact(HitActor, MyPawn);
-				DrawDebugSphere(GetWorld(), Hit.ImpactPoint, Radius, 32, SphereColor, false, 4.0f);
-				DrawDebugLine(GetWorld(), EyeLocation, End, SphereColor, false, 2.0f, 0, 2.0f);
-				break;
-			}
+			continue;
 		}
+
+		APawn* MyPawn = Cast<APawn>(MyOwner);
+		ISGameplayInterface::Execute_Interact(HitActor, MyPawn);
+		DrawDebugSphere(GetWorld(), Hit.ImpactPoint, Radius, 32, SphereColor, false, 4.0f);
+		DrawDebugLine(GetWorld(), EyeLocation, End, SphereColor, false, 2.0f, 0, 2.0f);
+		break;
 	}
 }

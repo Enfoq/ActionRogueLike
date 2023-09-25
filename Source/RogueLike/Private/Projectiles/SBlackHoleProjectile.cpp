@@ -49,6 +49,6 @@ void ASBlackHoleProjectile::DestroyOverlappedActors()
 
 void ASBlackHoleProjectile::ActivateBlackHole()
 {
-	MovementComp->MaxSpeed = 150.f;
+	MovementComp->MaxSpeed = 300.f;
 	RadialForceComp->Activate();
 }

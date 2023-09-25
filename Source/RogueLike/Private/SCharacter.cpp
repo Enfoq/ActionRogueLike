@@ -8,6 +8,7 @@
 #include "InteractionComponents/SInteractionComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Components/SAttributesComponent.h"
 
 #define TRACE_LENGTH 80000.f;
 
@@ -28,6 +29,8 @@ ASCharacter::ASCharacter()
 	CameraComp->SetupAttachment(SpringArmComp);
 
 	InteractionComp = CreateDefaultSubobject<USInteractionComponent>(TEXT("Interaction"));
+
+	AttributesComp = CreateDefaultSubobject<USAttributesComponent>(TEXT("Attributes"));
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
