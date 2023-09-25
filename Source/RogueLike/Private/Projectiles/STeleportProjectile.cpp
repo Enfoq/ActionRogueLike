@@ -23,7 +23,7 @@ void ASTeleportProjectile::OnProjectileHit(UPrimitiveComponent* HitComponent, AA
 void ASTeleportProjectile::Detonate()
 {
 	MovementComp->StopMovementImmediately();
-	if (IsValid(HitEffect))
+	if (HitEffect)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitEffect, GetActorLocation(), GetActorRotation());
 	}
