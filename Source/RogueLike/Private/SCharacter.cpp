@@ -10,7 +10,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/SAttributesComponent.h"
 
-#define TRACE_LENGTH 80000.f;
+#define TRACE_LENGTH 5000.f;
 
 DEFINE_LOG_CATEGORY_STATIC(PLAYER, All, All)
 
