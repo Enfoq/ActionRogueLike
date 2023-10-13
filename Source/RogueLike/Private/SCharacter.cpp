@@ -10,7 +10,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/SAttributesComponent.h"
 
-#define TRACE_LENGTH 80000.f;
+#define TRACE_LENGTH 5000.f;
 
 DEFINE_LOG_CATEGORY_STATIC(PLAYER, All, All)
 
@@ -104,6 +104,22 @@ void ASCharacter::PrimaryAttack()
 void ASCharacter::PrimaryInteract()
 {
 	InteractionComp->PrimaryInteract();
+}
+
+void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributesComponent* OwningComp, float NewHealth, float Delta)
+{
+	if (NewHealth <= 0.0f && Delta < 0.0f)
+	{
+		APlayerController* PC = Cast<APlayerController>(GetController());
+		DisableInput(PC);
+	}
+}
+
+void ASCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	AttributesComp->OnHealthChanged.AddDynamic(this, &ThisClass::OnHealthChanged);
 }
 
 // Called every frame

@@ -10,24 +10,30 @@ void ASTeleportProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SphereComp->OnComponentHit.AddDynamic(this, &ThisClass::OnProjectileHit);
-	SphereComp->IgnoreActorWhenMoving(GetInstigator(), true);
 	StartDetonateTimer();
 }
 
 void ASTeleportProjectile::OnProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	StopDetonateTimer();
 	Detonate();
+}
+
+void ASTeleportProjectile::Explode_Implementation()
+{
+	if (HitEffect)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitEffect, GetActorLocation(), GetActorRotation());
+	}
 }
 
 void ASTeleportProjectile::Detonate()
 {
 	MovementComp->StopMovementImmediately();
-	if (HitEffect)
-	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitEffect, GetActorLocation(), GetActorRotation());
-	}
+	SphereComp->SetSimulatePhysics(false);
+	SetActorEnableCollision(false);
 
+	Explode();
 	StartTeleportTimer();
 }
 
@@ -38,17 +44,21 @@ void ASTeleportProjectile::Teleport()
 	{
 		InstigatorPawn->TeleportTo(GetActorLocation(), InstigatorPawn->GetActorRotation(), false, true);
 	}
+	
 	Destroy();
 }
 
 void ASTeleportProjectile::StartDetonateTimer()
 {
-	FTimerHandle DetonateTimerHandle;
-	GetWorldTimerManager().SetTimer(DetonateTimerHandle, this, &ThisClass::Detonate, DetonateTimerValue, false);
+	GetWorldTimerManager().SetTimer(DetonateTimerHandle, this, &ThisClass::Detonate, DetonateTimerValue, false, DetonateTimerValue);
+}
+
+void ASTeleportProjectile::StopDetonateTimer()
+{
+	GetWorldTimerManager().ClearTimer(DetonateTimerHandle);
 }
 
 void ASTeleportProjectile::StartTeleportTimer()
 {
-	FTimerHandle TeleportTimerHandle;
-	GetWorldTimerManager().SetTimer(TeleportTimerHandle, this, &ThisClass::Teleport, DetonateTimerValue, false);
+	GetWorldTimerManager().SetTimer(TeleportTimerHandle, this, &ThisClass::Teleport, TimeToTeleport, false, TimeToTeleport);
 }

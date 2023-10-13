@@ -6,49 +6,54 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "PhysicsEngine/RadialForceComponent.h"
 
-#define BLACKHOLE_ANIM_DELAY 0.4f
-
 ASBlackHoleProjectile::ASBlackHoleProjectile()
 {
-	SphereComp->SetCollisionProfileName(TEXT("BlackHoleProjectile"));
-	SphereComp->SetGenerateOverlapEvents(true);
-
 	RadialForceComp = CreateDefaultSubobject<URadialForceComponent>(TEXT("RadialForceComponent"));
-	EObjectTypeQuery ObjectType = UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn);
-	RadialForceComp->RemoveObjectTypeToAffect(ObjectType);
 	RadialForceComp->SetupAttachment(RootComponent);
 }
 
 void ASBlackHoleProjectile::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SphereComp->OnComponentHit.Clear();
+	SphereComp->IgnoreActorWhenMoving(GetInstigator(), true);
+
 	RadialForceComp->bAutoActivate = false;
-	
-	GetWorldTimerManager().SetTimer(LifetimeTimerHandle, this, &ThisClass::DestroyOnTimer, 0.1f, false, LifeTimeOfProjectile);
-	GetWorldTimerManager().SetTimer(PullInOverlappedActorsTimerHandle, this, &ThisClass::DestroyOverlappedActors, 0.1f, true, BLACKHOLE_ANIM_DELAY);
 
 	FTimerHandle ActivateBlackHoleTHandle;
-	GetWorldTimerManager().SetTimer(ActivateBlackHoleTHandle, this, &ThisClass::ActivateBlackHole, 0.1f, false, BLACKHOLE_ANIM_DELAY);
+	GetWorldTimerManager().SetTimer(ActivateBlackHoleTHandle, this, &ThisClass::ActivateBlackHole, 0.1f, false, BlackHoleAnimDelay);
+
+	if (LifeTimeOfProjectile < BlackHoleAnimDelay)
+	{
+		LifeTimeOfProjectile *= 2.f; //double the value of lifetime if it's < than anim delay
+	}
+	GetWorldTimerManager().SetTimer(LifetimeTimerHandle, this, &ThisClass::DestroyOnTimer, 0.1f, false, LifeTimeOfProjectile);
 }
 
 void ASBlackHoleProjectile::DestroyOnTimer()
 {
-	GetWorldTimerManager().ClearTimer(PullInOverlappedActorsTimerHandle);
 	Destroy();
 }
 
-void ASBlackHoleProjectile::DestroyOverlappedActors()
+void ASBlackHoleProjectile::OnBlackHoleOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	TArray<AActor*> OverlappingActors;
-	SphereComp->GetOverlappingActors(OverlappingActors);
-	for (AActor* OverActor : OverlappingActors)
+	if (!IsValid(OtherActor) || !IsValid(OtherComp))
 	{
-		OverActor->Destroy();
+		return;
+	}
+
+	if (OtherComp->IsSimulatingPhysics())
+	{
+		OtherActor->Destroy();
 	}
 }
 
 void ASBlackHoleProjectile::ActivateBlackHole()
 {
+	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBlackHoleOverlapped);
+	SphereComp->SetGenerateOverlapEvents(true);
 	MovementComp->MaxSpeed = 300.f;
+
 	RadialForceComp->Activate();
 }
