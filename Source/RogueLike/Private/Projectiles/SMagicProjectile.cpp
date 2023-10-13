@@ -7,6 +7,11 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SAttributesComponent.h"
 
+void ASMagicProjectile::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
 void ASMagicProjectile::OnProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if (!IsValid(OtherActor) || OtherActor == GetInstigator())

@@ -19,11 +19,11 @@ class ASBlackHoleProjectile : public ASBaseProjectile
 public:
 	ASBlackHoleProjectile();
 
-	void BeginPlay() override;
-
 protected:
+	virtual void BeginPlay() override;
+
 	UPROPERTY(VisibleAnywhere)
-	URadialForceComponent* RadialForceComp;
+	URadialForceComponent* RadialForceComp = nullptr;
 
 	UPROPERTY(EditDefaultsOnly)
 	float LifeTimeOfProjectile = 5.0f;

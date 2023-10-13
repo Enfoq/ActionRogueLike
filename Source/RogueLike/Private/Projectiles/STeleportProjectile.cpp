@@ -21,10 +21,8 @@ void ASTeleportProjectile::OnProjectileHit(UPrimitiveComponent* HitComponent, AA
 
 void ASTeleportProjectile::Explode_Implementation()
 {
-	if (HitEffect)
-	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitEffect, GetActorLocation(), GetActorRotation());
-	}
+	SpawnProjectileHitEffects();
+	StartTeleportTimer();
 }
 
 void ASTeleportProjectile::Detonate()
@@ -34,7 +32,6 @@ void ASTeleportProjectile::Detonate()
 	SetActorEnableCollision(false);
 
 	Explode();
-	StartTeleportTimer();
 }
 
 void ASTeleportProjectile::Teleport()

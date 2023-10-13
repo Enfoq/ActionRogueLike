@@ -12,6 +12,8 @@ class USphereComponent;
 class UProjectileMovementComponent;
 class UParticleSystemComponent;
 class UParticleSystem;
+class USoundCue;
+class UAudioComponent;
 
 UCLASS()
 class ASBaseProjectile : public AActor, public ISProjectileInterface
@@ -27,13 +29,22 @@ protected:
 
 protected:
 	UPROPERTY(VisibleAnywhere)
-	USphereComponent* SphereComp;
+	USphereComponent* SphereComp = nullptr;
 
 	UPROPERTY(VisibleAnywhere)
-	UProjectileMovementComponent* MovementComp;
+	UProjectileMovementComponent* MovementComp = nullptr;
 
 	UPROPERTY(VisibleAnywhere)
-	UParticleSystemComponent* EffectComp;
+	UParticleSystemComponent* EffectComp = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
+	USoundCue* SoundHitEffect = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
+	UAudioComponent* AudioComp = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
+	USoundCue* SoundFlyEffect = nullptr;
 
 	UFUNCTION()
 	virtual void OnProjectileHit(
@@ -47,8 +58,13 @@ protected:
 	UFUNCTION(BlueprintNativeEvent)
 	void Explode();
 
+	UFUNCTION(BlueprintNativeEvent)
+	void SpawnProjectileHitEffects();
+
+	virtual void SpawnProjectileHitEffects_Implementation();
+
 	virtual void Explode_Implementation();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
-	UParticleSystem* HitEffect;
+	UParticleSystem* HitEffect = nullptr;
 };

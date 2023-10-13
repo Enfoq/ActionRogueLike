@@ -6,6 +6,8 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
+#include "Components/AudioComponent.h"
 
 // Sets default values
 ASBaseProjectile::ASBaseProjectile()
@@ -15,6 +17,9 @@ ASBaseProjectile::ASBaseProjectile()
 
 	EffectComp = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("EffectComponent"));
 	EffectComp->SetupAttachment(SphereComp);
+
+	AudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+	AudioComp->SetupAttachment(SphereComp);
 
 	MovementComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("MovementComponent"));
 	MovementComp->InitialSpeed = 1000.f;
@@ -30,6 +35,8 @@ void ASBaseProjectile::BeginPlay()
 
 	SphereComp->OnComponentHit.AddDynamic(this, &ThisClass::OnProjectileHit);
 	SphereComp->IgnoreActorWhenMoving(GetInstigator(), true);
+
+	AudioComp->Play();
 }
 
 void ASBaseProjectile::OnProjectileHit(
@@ -47,7 +54,20 @@ void ASBaseProjectile::Explode_Implementation()
 {
 	if (IsValid(this))
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitEffect, GetActorLocation(), GetActorRotation());
+		SpawnProjectileHitEffects();
 		Destroy();
+	}
+}
+
+void ASBaseProjectile::SpawnProjectileHitEffects_Implementation()
+{
+	if (HitEffect)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitEffect, GetActorLocation(), GetActorRotation());
+	}
+
+	if (SoundHitEffect)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), SoundHitEffect, GetActorLocation());
 	}
 }

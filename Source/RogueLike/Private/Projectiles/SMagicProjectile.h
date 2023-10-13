@@ -16,6 +16,8 @@ class ASMagicProjectile : public ASBaseProjectile
 	GENERATED_BODY()
 	
 protected:
+	virtual void BeginPlay() override;
+
 	virtual void OnProjectileHit (
 		UPrimitiveComponent* HitComponent,
 		AActor* OtherActor,
