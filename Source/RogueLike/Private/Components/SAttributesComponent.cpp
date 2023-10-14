@@ -3,14 +3,9 @@
 
 #include "Components/SAttributesComponent.h"
 
-USAttributesComponent::USAttributesComponent()
-{
-	Health = 100.f;
-}
-
 bool USAttributesComponent::ApplyHealthChange(float Delta)
 {
-	Health += Delta;
+	Health = FMath::Clamp(Health + Delta, 0.0f, MaxHealth);
 	OnHealthChanged.Broadcast(nullptr, this, Health, Delta);
 	return true;
 }
