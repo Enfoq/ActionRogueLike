@@ -6,6 +6,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SAttributesComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 void ASMagicProjectile::BeginPlay()
 {
@@ -24,6 +25,14 @@ void ASMagicProjectile::OnProjectileHit(UPrimitiveComponent* HitComponent, AActo
 	{
 		AttrComp->ApplyHealthChange(-20.f);
 	}
+
+	UGameplayStatics::PlayWorldCameraShake(
+		GetWorld(),
+		CameraShakeEffect,
+		GetActorLocation(),
+		InnerRadiusOfCameraShake,
+		OuterRadiusOfCameraShake
+	);
 
 	Super::OnProjectileHit(HitComponent, OtherActor, OtherComp, NormalImpulse, Hit);
 }
