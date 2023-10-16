@@ -33,16 +33,16 @@ public:
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	USAttributesComponent* AttributesComp;
+	USAttributesComponent* AttributesComp = nullptr;
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
-	USpringArmComponent* SpringArmComp;
+	USpringArmComponent* SpringArmComp = nullptr;
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
-	UCameraComponent* CameraComp;
+	UCameraComponent* CameraComp = nullptr;
 
 	UPROPERTY(VisibleAnywhere, Category = Interaction)
-	USInteractionComponent* InteractionComp;
+	USInteractionComponent* InteractionComp = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Attack")
 	TSubclassOf<AActor> BasicAttackProjectileClass;
@@ -53,8 +53,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Attack")
 	TSubclassOf<AActor> TeleportProjectileClass;
 
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	UAnimMontage* AttackAnim;
+	UPROPERTY(EditDefaultsOnly, Category = "Attack")
+	UAnimMontage* AttackAnim = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Attack")
+	FName HandSocketName;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
+	UParticleSystem* AttachedAttackEffect = nullptr;
 
 	FTimerHandle PrimaryAttackTimerHandle;
 
@@ -98,6 +104,8 @@ private:
 	void ChangeAttackTypeToTeleport();
 	void ChangeAttackTypeToSimple();
 	void ChangeAttackTypeToBlackHole();
+	FVector GetSocketLocationOnMesh(const FName& SocketName);
+	void SpawnAttackAttachedEffect(const FVector& Location, const FRotator& Rotation);
 
 	FVector_NetQuantize ImpactPoint;
 

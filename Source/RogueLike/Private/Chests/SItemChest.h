@@ -15,14 +15,12 @@ class ASItemChest : public AActor, public ISGameplayInterface
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ASItemChest();
 
 	UPROPERTY(EditAnywhere)
 	float TargetPitch;
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere)
@@ -30,6 +28,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* LidMesh;
+
 public:
 	void Interact_Implementation(APawn* InstigatorPawn);
 };

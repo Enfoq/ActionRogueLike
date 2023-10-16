@@ -39,8 +39,9 @@ ASCharacter::ASCharacter()
 
 void ASCharacter::PrimaryAttackTimeElapsed()
 {
-	FVector HandLocation = GetMesh()->GetSocketLocation(TEXT("Muzzle_01"));
+	FVector HandLocation = GetSocketLocationOnMesh(HandSocketName);
 	FRotator SpawnRotation = UKismetMathLibrary::FindLookAtRotation(HandLocation, ImpactPoint);
+	SpawnAttackAttachedEffect(HandLocation, SpawnRotation);
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -108,6 +109,12 @@ void ASCharacter::PrimaryInteract()
 
 void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributesComponent* OwningComp, float NewHealth, float Delta)
 {
+	if (Delta < 0.0f && IsValid(GetMesh()))
+	{
+		USkeletalMeshComponent* SkeletalMesh = GetMesh();
+		SkeletalMesh->SetScalarParameterValueOnMaterials("TimeToHit", GetWorld()->GetTimeSeconds());
+	}
+
 	if (NewHealth <= 0.0f && Delta < 0.0f)
 	{
 		APlayerController* PC = Cast<APlayerController>(GetController());
@@ -185,4 +192,26 @@ void ASCharacter::ChangeAttackTypeToBlackHole()
 {
 	UE_LOG(PLAYER, Display, TEXT("Changed attack type to BLACKHOLE"));
 	AttackType = EAttackType::BlackHole;
+}
+
+FVector ASCharacter::GetSocketLocationOnMesh(const FName& SocketName)
+{
+	if (IsValid(GetMesh()))
+	{
+		return GetMesh()->GetSocketLocation(SocketName);
+	}
+
+	return FVector::ZeroVector;
+}
+
+void ASCharacter::SpawnAttackAttachedEffect(const FVector& Location, const FRotator& Rotation)
+{
+	UGameplayStatics::SpawnEmitterAttached(
+		AttachedAttackEffect,
+		GetMesh(),
+		HandSocketName,
+		Location,
+		Rotation,
+		EAttachLocation::KeepRelativeOffset
+	);
 }
