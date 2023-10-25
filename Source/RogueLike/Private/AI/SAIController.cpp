@@ -10,10 +10,4 @@ void ASAIController::BeginPlay()
 	Super::BeginPlay();
 
 	RunBehaviorTree(BehaviorTree);
-
-	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-	if (IsValid(PlayerPawn))
-	{
-		GetBlackboardComponent()->SetValueAsObject(TEXT("TargetActor"), PlayerPawn);
-	}
 }
