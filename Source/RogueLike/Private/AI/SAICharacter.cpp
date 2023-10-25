@@ -2,18 +2,32 @@
 
 
 #include "AI/SAICharacter.h"
+#include "Perception/PawnSensingComponent.h"
+#include "AIModule/Classes/AIController.h"
+#include "AIModule/Classes/BehaviorTree/BlackboardComponent.h"
 
 ASAICharacter::ASAICharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
 }
 
-void ASAICharacter::BeginPlay()
+void ASAICharacter::PostInitializeComponents()
 {
-	Super::BeginPlay();
+	Super::PostInitializeComponents();
+
+	PawnSensingComponent->OnSeePawn.AddDynamic(this, &ThisClass::OnPawnSeen);
 }
 
-void ASAICharacter::Tick(float DeltaTime)
+void ASAICharacter::OnPawnSeen(APawn* Pawn)
 {
-	Super::Tick(DeltaTime);
+	AAIController* AIC = Cast<AAIController>(GetController());
+
+	if (IsValid(AIC))
+	{
+		UBlackboardComponent* BBComp = AIC->GetBlackboardComponent();
+
+		BBComp->SetValueAsObject(TEXT("TargetActor"), Pawn);
+	}
 }
