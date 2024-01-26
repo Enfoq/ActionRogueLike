@@ -15,6 +15,11 @@ bool USAttributesComponent::IsHealthFull() const
 	return Health == MaxHealth;
 }
 
+bool USAttributesComponent::IsLowHealth() const
+{
+	return Health < LowHealthThreshold;
+}
+
 bool USAttributesComponent::IsAlive() const
 {
 	return Health > 0.0f;

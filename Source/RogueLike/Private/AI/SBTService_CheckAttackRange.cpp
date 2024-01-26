@@ -10,30 +10,36 @@ void USBTService_CheckAttackRange::TickNode(UBehaviorTreeComponent& OwnerComp, u
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 
 	UBlackboardComponent* BlackBoardComp = OwnerComp.GetBlackboardComponent();
-	if (ensure(BlackBoardComp))
+	if (!IsValid(BlackBoardComp))
 	{
-		AActor* TargetActor = Cast<AActor>(BlackBoardComp->GetValueAsObject(TEXT("TargetActor")));
-		if (IsValid(TargetActor))
+		return;
+	}
+
+	AActor* TargetActor = Cast<AActor>(BlackBoardComp->GetValueAsObject(TEXT("TargetActor")));
+	if (!IsValid(TargetActor))
+	{
+		return;
+	}
+
+	AAIController* MyController = OwnerComp.GetAIOwner();
+	if (!IsValid(MyController))
+	{
+		return;
+	}
+
+	APawn* AIPawn = MyController->GetPawn();
+	if (ensure(AIPawn))
+	{
+		float DistanceTo = FVector::Distance(TargetActor->GetActorLocation(), AIPawn->GetActorLocation());
+
+		bool bWithingRange = DistanceTo < DistanceThreshold;
+		bool bHasLineOfSight = false;
+
+		if (bWithingRange)
 		{
-			AAIController* MyController = OwnerComp.GetAIOwner();
-			if (ensure(MyController))
-			{
-				APawn* AIPawn = MyController->GetPawn();
-				if (ensure(AIPawn))
-				{
-					float DistanceTo = FVector::Distance(TargetActor->GetActorLocation(), AIPawn->GetActorLocation());
-
-					bool bWithingRange = DistanceTo < DistanceThreshold;
-					bool bHasLineOfSight = false;
-
-					if (bWithingRange)
-					{
-						bHasLineOfSight = MyController->LineOfSightTo(TargetActor);
-					}
-					
-					BlackBoardComp->SetValueAsBool(AttackRangeKey.SelectedKeyName, bWithingRange && bHasLineOfSight);
-				}
-			}
+			bHasLineOfSight = MyController->LineOfSightTo(TargetActor);
 		}
+
+		BlackBoardComp->SetValueAsBool(AttackRangeKey.SelectedKeyName, bWithingRange && bHasLineOfSight);
 	}
 }
